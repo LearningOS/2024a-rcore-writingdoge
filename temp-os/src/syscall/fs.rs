@@ -1,15 +1,10 @@
 //! File and filesystem-related syscalls
-//! 
-use crate::task::update_task_info;
-
 
 const FD_STDOUT: usize = 1;
 
-/// syscall ID：64
 /// write buf of length `len`  to a file with `fd`
 pub fn sys_write(fd: usize, buf: *const u8, len: usize) -> isize {
     trace!("kernel: sys_write");
-    update_task_info(64);
     match fd {
         FD_STDOUT => {
             let slice = unsafe { core::slice::from_raw_parts(buf, len) };

@@ -14,7 +14,7 @@ pub struct TaskControlBlock {
     /// 维护桶。
     pub syscall_times: [u32; MAX_SYSCALL_NUM],
     /// 维护第一次调用后时间
-    pub time: usize
+    pub time: i32
 }
 
 /// The status of a task

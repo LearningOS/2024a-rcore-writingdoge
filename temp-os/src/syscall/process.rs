@@ -2,7 +2,7 @@
 use crate::{
     config::MAX_SYSCALL_NUM,
     task::{exit_current_and_run_next, suspend_current_and_run_next, TaskStatus},
-    timer::{get_time_us,get_time_ms},
+    timer::get_time_us,
     task::update_task_info,
 };
 
@@ -65,7 +65,7 @@ pub fn sys_task_info(_ti: *mut TaskInfo) -> isize {
     unsafe {
     (*_ti).status = task_status;
     (*_ti).syscall_times = syscall_times;
-    (*_ti).time = (get_time_ms()-(time as usize)) as usize;
+    (*_ti).time = (get_time_us()-(time as usize)) as usize;
     }
     0
 }
