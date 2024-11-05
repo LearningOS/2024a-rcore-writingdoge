@@ -9,7 +9,8 @@ pub struct TaskContext {
     /// Stack pointer
     sp: usize,
     /// s0-11 register, callee saved
-    s: [usize; 12],
+    s: [usize; 12]
+
 }
 
 impl TaskContext {
