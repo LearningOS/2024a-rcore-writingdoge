@@ -15,6 +15,8 @@ mod switch;
 mod task;
 
 use crate::config::MAX_APP_NUM;
+use crate::config::MAX_SYSCALL_NUM;
+use crate::timer::get_time;
 use crate::loader::{get_num_app, init_app_cx};
 use crate::sync::UPSafeCell;
 use lazy_static::*;
@@ -137,6 +139,47 @@ impl TaskManager {
             panic!("All applications completed!");
         }
     }
+
+    fn get_cur_task(&self) -> usize{
+        let inner: core::cell::RefMut<'_, TaskManagerInner> = self.inner.exclusive_access();
+        return inner.current_task;
+    }
+
+    // fn update_task_info(&self,id:usize) -> TaskControlBlock {
+    //     let mut inner: core::cell::RefMut<'_, TaskManagerInner> = self.inner.exclusive_access();
+    //     let cur_task_id:usize = inner.current_task;
+    //     let cur_task: &mut TaskControlBlock = &mut inner.tasks[cur_task_id];
+        
+    //     let time = get_time();
+
+    //     // 第一次调用的时间
+    //     if cur_task.time ==-1{
+    //         cur_task.time = time as i32;
+    //     }
+
+    //     cur_task.syscall_times[id]+=1;
+
+    //     return inner.tasks[cur_task_id].clone();
+    // }
+
+    fn update_task_info(&self,id:usize) -> (TaskStatus, [u32; MAX_SYSCALL_NUM], i32) {
+        let mut inner: core::cell::RefMut<'_, TaskManagerInner> = self.inner.exclusive_access();
+        let cur_task_id:usize = inner.current_task;
+        let cur_task: &mut TaskControlBlock = &mut inner.tasks[cur_task_id];
+        
+        let time = get_time();
+
+        // 第一次调用的时间
+        if cur_task.time ==-1{
+            cur_task.time = time as i32;
+        }
+
+        cur_task.syscall_times[id]+=1;
+
+        (cur_task.task_status, cur_task.syscall_times, cur_task.time)
+    }
+
+    
 }
 
 /// Run the first task in task list.
@@ -170,4 +213,14 @@ pub fn suspend_current_and_run_next() {
 pub fn exit_current_and_run_next() {
     mark_current_exited();
     run_next_task();
+}
+
+/// 返回正在跑的taskid
+pub fn get_cur_task() {
+    TASK_MANAGER.get_cur_task();
+}
+
+/// 更新且返回一些task_info
+pub fn update_task_info(id:usize) -> (TaskStatus, [u32; 500], i32) {
+    TASK_MANAGER.update_task_info(id)
 }

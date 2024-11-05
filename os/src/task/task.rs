@@ -11,7 +11,9 @@ pub struct TaskControlBlock {
     pub task_status: TaskStatus,
     /// The task context
     pub task_cx: TaskContext,
+    /// 维护桶。
     pub syscall_times: [u32; MAX_SYSCALL_NUM],
+    /// 维护第一次调用后时间
     pub time: i32
 }
 
